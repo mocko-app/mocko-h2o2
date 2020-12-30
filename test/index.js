@@ -125,28 +125,6 @@ describe('h2o2', () => {
         await upstream.stop();
     });
 
-    it('throws when used with explicit route payload config other than data or steam', async () => {
-
-        const server = Hapi.server();
-        await server.register(H2o2);
-
-        expect(() => {
-
-            server.route({
-                method: 'POST',
-                path: '/',
-                config: {
-                    handler: {
-                        proxy: { host: 'example.com' }
-                    },
-                    payload: {
-                        output: 'file'
-                    }
-                }
-            });
-        }).to.throw('Cannot proxy if payload is parsed or if output is not stream or data');
-    });
-
     it('throws when setup with invalid options', async () => {
 
         const server = Hapi.server();
@@ -164,28 +142,6 @@ describe('h2o2', () => {
                 }
             });
         }).to.throw(/\"value\" must contain at least one of \[host, mapUri, uri\]/);
-    });
-
-    it('throws when used with explicit route payload parse config set to false', async () => {
-
-        const server = Hapi.server();
-        await server.register(H2o2);
-
-        expect(() => {
-
-            server.route({
-                method: 'POST',
-                path: '/',
-                config: {
-                    handler: {
-                        proxy: { host: 'example.com' }
-                    },
-                    payload: {
-                        parse: true
-                    }
-                }
-            });
-        }).to.throw('Cannot proxy if payload is parsed or if output is not stream or data');
     });
 
     it('allows when used with explicit route payload output data config', async () => {
