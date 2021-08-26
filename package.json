@@ -1,7 +1,7 @@
 {
   "name": "@mocko/h2o2",
   "description": "Mocko's fork of @hapi/h2o2",
-  "version": "9.0.3",
+  "version": "9.1.0",
   "repository": "git://github.com/gabriel-pinheiro/h2o2",
   "main": "lib/index.js",
   "engines": {
@@ -21,7 +21,7 @@
     "@hapi/boom": "9.x.x",
     "@hapi/hoek": "9.x.x",
     "@hapi/validate": "1.x.x",
-    "@hapi/wreck": "17.x.x",
+    "@mocko/wreck": "^17.1.0",
     "debug": "^4.3.1"
   },
   "devDependencies": {
