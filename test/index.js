@@ -258,6 +258,87 @@ describe('h2o2', () => {
         await upstream.stop();
     });
 
+    it('sets host header to upstream from proxy config', async () => {
+
+        const handler = function (request, h) {
+
+            return h.response(request.raw.req.headers.host);
+        };
+
+        const host = '127.0.0.1';
+
+        const upstream = Hapi.server({ host });
+        upstream.route({ method: 'GET', path: '/', handler });
+        await upstream.start();
+
+        const server = Hapi.server({ host });
+        await server.register(H2o2);
+
+        server.route({
+            method: 'GET',
+            path: '/',
+            handler: {
+                proxy: {
+                    host: upstream.info.host,
+                    port: upstream.info.port,
+                    protocol: 'http',
+                    passThrough: true
+                }
+            }
+        });
+        await server.start();
+
+        const response = await Wreck.get(`http://${server.info.host}:${server.info.port}/`);
+        expect(response.res.statusCode).to.equal(200);
+
+        const result = response.payload.toString();
+        expect(result).to.equal(`${host}:${upstream.info.port}`);
+
+        await server.stop();
+        await upstream.stop();
+    });
+
+    it('passes through host header when proxyHost is set', async () => {
+
+        const handler = function (request, h) {
+
+            return h.response(request.raw.req.headers.host);
+        };
+
+        const host = '127.0.0.1';
+
+        const upstream = Hapi.server({ host });
+        upstream.route({ method: 'GET', path: '/', handler });
+        await upstream.start();
+
+        const server = Hapi.server({ host });
+        await server.register(H2o2);
+
+        server.route({
+            method: 'GET',
+            path: '/',
+            handler: {
+                proxy: {
+                    host: upstream.info.host,
+                    port: upstream.info.port,
+                    protocol: 'http',
+                    passThrough: true,
+                    proxyHost: true
+                }
+            }
+        });
+        await server.start();
+
+        const response = await Wreck.get(`http://${server.info.host}:${server.info.port}/`);
+        expect(response.res.statusCode).to.equal(200);
+
+        const result = response.payload.toString();
+        expect(result).to.equal(`${host}:${server.info.port}`);
+
+        await server.stop();
+        await upstream.stop();
+    });
+
     it('forwards gzipped content', async () => {
 
         const gzipHandler = function (request, h) {
